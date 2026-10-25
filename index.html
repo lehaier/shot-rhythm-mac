@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101215">
+  <title>镜头节奏 · Shot Rhythm</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark"><i></i><i></i><i></i><i></i></span><span>镜头节奏 <small>SHOT RHYTHM</small></span></div>
+    <div class="top-note">本地视频分析工具 <span class="live-dot"></span> 视频仅在本机处理</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow">VIDEO RHYTHM ANALYSIS <span> / 01</span></div>
+      <h1>让镜头的呼吸，<br><em>一目了然。</em></h1>
+      <p>将整部影片的剪切节奏，浓缩为一条按真实时间比例绘制的色带。红色越深，镜头越短；蓝色越深，镜头越长。</p>
+    </section>
+
+    <section class="upload-panel" id="dropZone" aria-label="选择视频">
+      <input id="fileInput" type="file" accept="video/*,.mkv,.mov,.avi,.mp4,.webm,.m4v" hidden>
+      <div class="upload-icon">↥</div>
+      <div class="upload-copy"><strong id="uploadTitle">拖入一段视频，开始分析</strong><span id="uploadHint">或点击这里选择文件 · MP4 / MOV / MKV / WebM 等</span></div>
+      <button id="chooseBtn" class="button primary" type="button">选择视频 <span>↗</span></button>
+    </section>
+
+    <div id="uploadError" class="upload-error" role="alert" hidden><span id="uploadErrorText"></span><button id="retryBtn" class="button subtle" type="button">重试分析</button></div>
+
+    <section class="workspace" id="workspace" hidden>
+      <div class="workspace-head">
+        <div><div class="eyebrow">THE TIMELINE <span> / 02</span></div><h2>节奏时间轴</h2><p id="fileMeta" class="muted"></p></div>
+        <div class="actions"><button id="svgBtn" class="button subtle">导出 SVG</button><button id="pngBtn" class="button subtle">导出 PNG</button><button id="csvBtn" class="button subtle">导出 CSV</button></div>
+      </div>
+
+      <div class="stats" aria-label="统计信息">
+        <div class="stat"><span>视频时长</span><strong id="durationStat">—</strong></div>
+        <div class="stat"><span>镜头数量</span><strong id="countStat">—</strong></div>
+        <div class="stat"><span>镜头时长中位数</span><strong id="medianStat">—</strong></div>
+        <div class="stat"><span>平均镜头时长</span><strong id="meanStat">—</strong></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-top"><div><span class="small-label">全片概览</span><span class="muted">点击色块定位镜头</span></div><label class="zoom">放大 <input id="zoomRange" type="range" min="1" max="12" step="0.5" value="1"><span id="zoomValue">1×</span></label></div>
+        <div class="chart-scroll" id="chartScroll"><svg id="timeline" role="img" aria-label="镜头节奏时间轴"></svg></div>
+        <div class="legend"><span class="legend-fast">快 · 短镜头</span><div class="legend-ramp"><i></i><b id="legendMedian"></b><i></i></div><span class="legend-slow">慢 · 长镜头</span></div>
+      </div>
+
+      <div class="lower-grid">
+        <section class="card preview-card"><div class="card-head"><div><span class="small-label">画面预览</span><h3 id="selectedTitle">选择一个镜头</h3></div><span id="selectedTime" class="timecode">—</span></div><video id="preview" controls preload="metadata"></video><div class="preview-note" id="selectedNote">点击时间轴上的色块查看镜头信息。</div></section>
+        <section class="card edit-card"><div class="card-head"><div><span class="small-label">CUT POINTS</span><h3>切点校正</h3></div><span id="cutCount" class="pill">0 个切点</span></div><p class="muted edit-intro">自动识别可能漏掉叠化或误判快速运动。可在播放位置或指定秒数添加切点，并修改选中镜头的边界。</p><div class="edit-row"><button id="addAtPlayhead" class="button primary" type="button">＋ 在当前播放位置添加切点</button></div><div class="edit-fields"><label>指定秒数 <input id="addInput" type="number" min="0" step="0.001" placeholder="例如 12.5"></label><button id="addAtTime" class="button subtle" type="button">添加切点</button></div><div class="edit-fields"><label>镜头起点 <input id="startInput" type="number" min="0" step="0.001" placeholder="秒"></label><button id="saveStart" class="button subtle" type="button">修改</button><button id="removeStart" class="button ghost" type="button">删除切点</button></div><div class="edit-fields"><label>镜头终点 <input id="endInput" type="number" min="0" step="0.001" placeholder="秒"></label><button id="saveEnd" class="button subtle" type="button">修改</button><button id="removeEnd" class="button ghost" type="button">删除切点</button></div><p id="editMessage" class="edit-message" role="status"></p></section>
+      </div>
+
+      <details class="settings"><summary>重新检测与数据说明 <span>⌄</span></summary><div class="settings-inner"><label>切点检测阈值 <input id="thresholdRange" type="range" min="5" max="30" step="1" value="10"><b id="thresholdValue">10</b></label><button id="reanalyzeBtn" class="button subtle" type="button">重新分析视频</button><p>阈值越低越敏感，切点可能更多；越高越严格。重新分析会替换手工校正的切点。色深按镜头时长相对中位数的偏离程度计算；特别极端的镜头会限制在最深色，保证其他镜头仍能分辨。</p></div></details>
+    </section>
+    <footer>SHOT RHYTHM <span>—</span> EVERY CUT HAS A PULSE.</footer>
+  </main>
+  <div id="busy" class="busy" hidden><div class="busy-box"><div class="spinner"></div><strong id="busyTitle">正在分析画面…</strong><p id="busyText">视频越长，所需时间越久。请保持页面打开。</p><div class="progress"><i id="progressFill"></i></div></div></div>
+  <script src="/app.js"></script>
+</body>
+</html>
